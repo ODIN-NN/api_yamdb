@@ -12,14 +12,23 @@ from rest_framework.response import Response
 from rest_framework_simplejwt import tokens
 from rest_framework_simplejwt.views import TokenViewBase
 
-from reviews.models import Categories, Comments, Genres, Reviews, Title
+from reviews.models import (
+    Category,
+    Comment,
+    Genre,
+    Review,
+    Title # Users
+)
+
 from users.models import User
 from .permissions import IsAdmin
+
+
 from .serializers import (
-    CommentsSerializer,
-    CategoriesSerializer,
-    GenresSerializer,
-    ReviewsSerializer,
+    CommentSerializer,
+    CategorySerializer,
+    GenreSerializer,
+    ReviewSerializer,
     TitleSerializer,
     UserSerializer,
     SignUpSerializer,
@@ -85,17 +94,26 @@ class CommentViewSet(viewsets.ModelViewSet):
     pass
 
 
-class CategoriesViewSet(viewsets.ModelViewSet):
-    pass
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
 
 
-class GenresViewSet(viewsets.ModelViewSet):
-    pass
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
 
 
-class GenresViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(viewsets.ModelViewSet):
     pass
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
+    pagination_class = LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('category', 'genre', 'name', 'year')

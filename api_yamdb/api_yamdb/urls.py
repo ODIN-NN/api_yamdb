@@ -6,22 +6,19 @@ from django.conf.urls.static import static
 from rest_framework import routers
 
 from api.views import (
-    # CommentViewSet,
-    # FollowViewSet,
-    # GroupViewSet,
-    # PostViewSet,
+    CategoryViewSet,
+    GenreViewSet,
+    TitleViewSet,
     UserViewSet,
     TokenObtainPairView,
     create,
 )
 
 router = routers.DefaultRouter()
-
-# router.register(r'posts', PostViewSet)
-# router.register(r'^groups', GroupViewSet)
-# router.register(r'^groups/(?P<group_id>\d+)', GroupViewSet)
-# router.register(r'follow', FollowViewSet, basename='follow')
-# router.register(r'^posts/(?P<post_id>\d+)/comments', CommentViewSet)
+router.register(r'categories', CategoryViewSet)
+router.register(r'genres', GenreViewSet)
+router.register(r'titles', TitleViewSet)
+router.register(r'^titles/(?P<titles_id>\d+)', TitleViewSet)
 router.register('users', UserViewSet, basename='users')
 
 
