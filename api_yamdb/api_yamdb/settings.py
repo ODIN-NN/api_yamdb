@@ -130,3 +130,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'example@example.com'
 
 HOST_NAME = os.getenv('HOST_NAME', 'mysite.com')
+
+
+# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY1OTQ2OTM4LCJpYXQiOjE2NjUwODI5MzgsImp0aSI6IjVmMWRmNjMxMGQ2ZTQzODBiZjZiNGRjODMwMzA4Mzc1IiwidXNlcl9pZCI6Mn0.CZpIIIHB6CV15vSZVya88rPguzEGJ6SSEt9DQAs8fj8
+    # "username": "antkrav2",
+    # "confirmation_code": "ShuN_r2RzCMLV4XKlyaPme-AyiqrbxgasKK1YfsPxOY"
