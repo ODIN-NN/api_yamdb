@@ -25,7 +25,7 @@ from .serializers import (
     SignUpSerializer,
     ObtainTokenSerializer,
 )
-from api_yamdb.settings import DEFAULT_FROM_EMAIL, HOST_NAME
+from api_yamdb.settings import DEFAULT_FROM_EMAIL
 
 
 @api_view(['POST'])
@@ -41,7 +41,7 @@ def create(request):
         confirmation_code=token
     )
     message = ('Для завершения регистрации на сайте введите '
-               f'confirmation_code = {token}')
+               f'confirmation_code: {token}')
     send_mail(
         subject='Регистрация на сайте',
         message=message,
