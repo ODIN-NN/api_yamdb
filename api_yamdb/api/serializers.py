@@ -60,12 +60,6 @@ class ObtainTokenSerializer(serializers.ModelSerializer):
         refresh = RefreshToken.for_user(user)
         data = {'access_token': str(refresh.access_token)}
         return data
-    # username = serializers.RegexField(
-    #     regex=r'^[\w.@+-]',
-    #     required=True,
-    #     max_length=150
-    # )
-    # confirmation_code = serializers.CharField(required=True)
 
     class Meta:
         model = User

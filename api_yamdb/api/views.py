@@ -40,8 +40,8 @@ def create(request):
         email=serializer.data.get('email'),
         confirmation_code=token
     )
-    message = ('Для завершения регистрации на сайте введите'
-               f'confirmation_code={token}')
+    message = ('Для завершения регистрации на сайте введите '
+               f'confirmation_code = {token}')
     send_mail(
         subject='Регистрация на сайте',
         message=message,
@@ -50,24 +50,6 @@ def create(request):
     )
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-# class CustomAuthToken(CreateAPIView):
-#     queryset = User.objects.all()
-#     permission_classes = (permissions.AllowAny,)
-#     serializer_class = ObtainTokenSerializer
-
-#     def get_token(self, request):
-#         """Отправка token."""
-#         serializer = ObtainTokenSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         username = serializer.data.get('username')
-#         confirmation_code = serializer.data.get('confirmation_code')
-#         user = get_object_or_404(User, username=username)
-#         if default_token_generator.check_token(user, confirmation_code):
-#             token = tokens.AccessToken.for_user(user)
-#             return Response({'token': f'{token}'}, status=status.HTTP_200_OK)
-#         return Response({'confirmation_code': 'Неверный код подтверждения'},
-#                         status=status.HTTP_400_BAD_REQUEST)
 
 class TokenObtainPairView(TokenViewBase):
     serializer_class = ObtainTokenSerializer
