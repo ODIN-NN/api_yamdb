@@ -20,3 +20,11 @@ class User(AbstractUser):
         'Email', max_length=254, unique=True, blank=False
     )
     confirmation_code = models.TextField('Код подтверждения', null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['username', 'email'],
+                name='unique_username_email'
+            )
+        ]

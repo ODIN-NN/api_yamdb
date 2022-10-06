@@ -11,8 +11,8 @@ from api.views import (
     # GroupViewSet,
     # PostViewSet,
     UserViewSet,
-    CustomAuthToken,
-    registration,
+    TokenObtainPairView,
+    create,
 )
 
 router = routers.DefaultRouter()
@@ -28,8 +28,8 @@ router.register('users', UserViewSet, basename='users')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(router.urls)),
-    path('api/v1/auth/token/', CustomAuthToken.as_view()),
-    path('api/v1/auth/signup/', registration),
+    path('api/v1/auth/token/', TokenObtainPairView.as_view()),
+    path('api/v1/auth/signup/', create),
     path(
         'redoc/',
         TemplateView.as_view(template_name='redoc.html'),
