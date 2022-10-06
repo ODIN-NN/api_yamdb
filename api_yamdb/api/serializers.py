@@ -13,8 +13,9 @@ from reviews.models import (
     Comment,
     Genre,
     Review,
-    Title # Users
+    Title
 )
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -90,10 +91,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    pass
-
-
 class GenreSerializer(serializers.ModelSerializer):
     name = serializers.StringRelatedField()
     slug = SlugRelatedField(
@@ -104,10 +101,6 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = '__all__'
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-    pass
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -128,3 +121,15 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
