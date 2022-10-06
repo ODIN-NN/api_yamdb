@@ -7,25 +7,23 @@ from django.conf.urls.static import static
 from rest_framework import routers
 
 from api.views import (
-#     CommentViewSet,
-#     FollowViewSet,
-#     GroupViewSet,
+    CategoryViewSet,
+    GenreViewSet,
+    TitleViewSet,
 #     PostViewSet,
 #     UserViewSet
 )
 
 router = routers.DefaultRouter()
-# router.register(r'posts', PostViewSet)
-# router.register(r'^groups', GroupViewSet)
-# router.register(r'^groups/(?P<group_id>\d+)', GroupViewSet)
-# router.register(r'users', UserViewSet)
-# router.register(r'follow', FollowViewSet, basename='follow')
-# router.register(r'^posts/(?P<post_id>\d+)/comments', CommentViewSet)
+router.register(r'categories', CategoryViewSet)
+router.register(r'genres', GenreViewSet)
+router.register(r'titles', TitleViewSet)
+router.register(r'^titles/(?P<titles_id>\d+)', TitleViewSet)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-#    path('api/v1/', include(router.urls)),
+    path('api/v1/', include(router.urls)),
 #    path('auth/', include('djoser.urls')),
 #    path('api/v1/', include('djoser.urls.jwt')),
     path(
@@ -36,10 +34,10 @@ urlpatterns = [
 ]
 
 
-if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-    )
-    urlpatterns += static(
-        settings.STATIC_URL, document_root=settings.STATIC_ROOT
-    )
+# if settings.DEBUG:
+#     urlpatterns += static(
+#         settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+#     )
+#     urlpatterns += static(
+#         settings.STATIC_URL, document_root=settings.STATIC_ROOT
+#     )
