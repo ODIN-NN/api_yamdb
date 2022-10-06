@@ -34,7 +34,7 @@ from .serializers import (
     SignUpSerializer,
     ObtainTokenSerializer,
 )
-from api_yamdb.settings import DEFAULT_FROM_EMAIL, HOST_NAME
+from api_yamdb.settings import DEFAULT_FROM_EMAIL
 
 
 @api_view(['POST'])
@@ -50,7 +50,7 @@ def create(request):
         confirmation_code=token
     )
     message = ('Для завершения регистрации на сайте введите '
-               f'confirmation_code = {token}')
+               f'confirmation_code: {token}')
     send_mail(
         subject='Регистрация на сайте',
         message=message,
@@ -90,10 +90,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class CommentViewSet(viewsets.ModelViewSet):
-    pass
-
-
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -106,10 +102,6 @@ class GenreViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
-    pass
-
-
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
@@ -117,3 +109,29 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('category', 'genre', 'name', 'year')
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+
+    def get_title(self):
+        return get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+
+    def get_queryset(self):
+        return self.get_title().reviews.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, title=self.get_title())
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+
+    def get_review(self):
+        return get_object_or_404(Title, pk=self.kwargs.get('review_id'))
+
+    def get_queryset(self):
+        return self.get_review().comments.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, review=self.get_review())

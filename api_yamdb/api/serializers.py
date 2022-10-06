@@ -12,20 +12,25 @@ from reviews.models import (
     Comment,
     Genre,
     Review,
-    Title # Users
+    Title
 )
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = (
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
-        )
+        fields = ('username',
+                  'email',
+                  'first_name',
+                  'last_name',
+                  'bio',
+                  'role')
 
     def validate(self, data):
         if data.get('username') == 'me':
             raise serializers.ValidationError(
-                'Username указан неверно!')
+                'Username указан неверно!'
+            )
         return data
 
 
@@ -34,8 +39,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         required=True,
         max_length=254,
     )
-    username = serializers.RegexField(
-        regex=r'^[\w.@+-]',
+    username = serializers.CharField(
         required=True,
         max_length=150
     )
@@ -47,7 +51,9 @@ class SignUpSerializer(serializers.ModelSerializer):
     def validate(self, value):
         username = value['username']
         if username == 'me':
-            raise serializers.ValidationError('Недопустимое имя')
+            raise serializers.ValidationError(
+                'Использовать имя "me" в качестве username запрещено'
+            )
         return value
 
 
@@ -86,10 +92,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    pass
-
-
 class GenreSerializer(serializers.ModelSerializer):
     # name = serializers.StringRelatedField()
     # slug = SlugRelatedField(
@@ -100,10 +102,6 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug')
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-    pass
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -125,5 +123,16 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        # fields = '__all__'
-        fields = ('name', 'year', 'rating', 'description', 'genre', 'category')
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
