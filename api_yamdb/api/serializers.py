@@ -8,7 +8,7 @@ from reviews.models import (
     Comment,
     Genre,
     Review,
-    Title  # Users
+    Title
 )
 
 
@@ -65,35 +65,31 @@ class ObtainTokenSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.StringRelatedField()
-    slug = SlugRelatedField(
-        slug_field='slug',
-        queryset=Category.objects.all()
-    )
+    # name = serializers.StringRelatedField()
+    # slug = SlugRelatedField(
+    #     slug_field='slug',
+    #     queryset = Category.objects.all()
+    #     # queryset=Genre.objects.select_related('categories')
+    #     # qs = Album.objects.prefetch_related('tracks')
+    # )
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('name', 'slug', )
 
-
-class CommentSerializer(serializers.ModelSerializer):
-    pass
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.StringRelatedField()
-    slug = SlugRelatedField(
-        slug_field='slug',
-        queryset=Genre.objects.all()
-    )
+    # name = serializers.StringRelatedField()
+    # slug = serializers.SlugRelatedField(
+    #     slug_field='slug',
+    #     queryset=Genre.objects.all()
+    # )
 
     class Meta:
         model = Genre
-        fields = '__all__'
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-    pass
+        fields = ('name', 'slug', )
+        # read_only_fields = ('slug', )
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -101,16 +97,31 @@ class TitleSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField()
     rating = serializers.IntegerField(read_only=True)
     description = serializers.CharField(required=False)
-    genre = SlugRelatedField(
+    # genre = GenreSerializer(many=True, read_only=True)
+    # category = CategorySerializer(read_only=True)
+    genre = serializers.SlugRelatedField(
         slug_field='name',
         many=True,
-        queryset=Title.objects.select_related('genres')
+        queryset=Genre.objects.all(),
+        required=False
     )
-    category = SlugRelatedField(
+    category = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=Title.objects.select_related('categories')
+        queryset=Category.objects.all()
     )
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
