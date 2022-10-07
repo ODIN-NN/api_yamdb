@@ -17,14 +17,9 @@ class User(AbstractUser):
         'Роль', max_length=30, choices=ROLE_CHOICES, default='user'
     )
     email = models.EmailField(
-        'Email', max_length=254, unique=True, blank=False
+        'Email', max_length=254, unique=True, null=True
     )
     confirmation_code = models.TextField('Код подтверждения', null=True)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['username', 'email'],
-                name='unique_username_email'
-            )
-        ]
+        ordering = ['-id']

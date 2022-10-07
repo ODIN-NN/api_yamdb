@@ -1,13 +1,8 @@
-from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import serializers
-
 from rest_framework.relations import SlugRelatedField
-
+from rest_framework.validators import UniqueValidator
 
 from users.models import User
-
 from reviews.models import (
     Category,
     Comment,
@@ -18,6 +13,15 @@ from reviews.models import (
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        validators=[UniqueValidator(queryset=User.objects.all())],
+        required=True,
+    )
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())],
+        required=True,
+    )
+
     class Meta:
         model = User
         fields = ('username',
@@ -27,26 +31,19 @@ class UserSerializer(serializers.ModelSerializer):
                   'bio',
                   'role')
 
-    def validate(self, data):
-        if data.get('username') == 'me':
-            raise serializers.ValidationError(
-                'Username указан неверно!'
-            )
-        return data
-
 
 class SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        required=True,
-        max_length=254,
-    )
     username = serializers.CharField(
+        validators=[UniqueValidator(queryset=User.objects.all())],
         required=True,
-        max_length=150
+    )
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())],
+        required=True,
     )
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('email', 'username')
 
     def validate(self, value):
@@ -62,45 +59,37 @@ class ObtainTokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
-    def validate(self, attrs):
-        user = get_object_or_404(
-            get_user_model(), username=attrs.get('username')
-        )
-        if user.confirmation_code != attrs.get('confirmation_code'):
-            raise serializers.ValidationError(
-                'Некорректный код подтверждения'
-            )
-        refresh = RefreshToken.for_user(user)
-        data = {'access_token': str(refresh.access_token)}
-        return data
-
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.StringRelatedField()
-    slug = SlugRelatedField(
-        slug_field='slug',
-        queryset=Category.objects.all()
-    )
+    # name = serializers.StringRelatedField()
+    # slug = SlugRelatedField(
+    #     slug_field='slug',
+    #     queryset = Category.objects.all()
+    #     # queryset=Genre.objects.select_related('categories')
+    #     # qs = Album.objects.prefetch_related('tracks')
+    # )
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('name', 'slug', )
+
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.StringRelatedField()
-    slug = SlugRelatedField(
-        slug_field='slug',
-        queryset=Genre.objects.all()
-    )
+    # name = serializers.StringRelatedField()
+    # slug = serializers.SlugRelatedField(
+    #     slug_field='slug',
+    #     queryset=Genre.objects.all()
+    # )
 
     class Meta:
         model = Genre
-        fields = '__all__'
+        fields = ('name', 'slug', )
+        # read_only_fields = ('slug', )
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -108,14 +97,17 @@ class TitleSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField()
     rating = serializers.IntegerField(read_only=True)
     description = serializers.CharField(required=False)
-    genre = SlugRelatedField(
+    # genre = GenreSerializer(many=True, read_only=True)
+    # category = CategorySerializer(read_only=True)
+    genre = serializers.SlugRelatedField(
         slug_field='name',
         many=True,
-        queryset=Title.objects.select_related('genres')
+        queryset=Genre.objects.all(),
+        required=False
     )
-    category = SlugRelatedField(
+    category = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=Title.objects.select_related('categories')
+        queryset=Category.objects.all()
     )
 
     class Meta:
