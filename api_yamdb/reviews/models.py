@@ -2,7 +2,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 from django.db import models
 
-from ..users.models import User
+from users.models import User
 
 
 class Genre(models.Model):
@@ -73,7 +73,13 @@ class Comment(models.Model):
     review_id = models.ForeignKey(Review, on_delete=models.CASCADE,
                                   related_name='comments')
     text = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name='comments')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        'Дата добавления',
+        auto_now_add=True,
+        db_index=True,
+    )

@@ -2,10 +2,10 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
+
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Categories, Comments, Genres, Reviews, Title
+
 from users.models import User
 
 from reviews.models import (
