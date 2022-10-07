@@ -126,5 +126,5 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = 'users.User'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'example@example.com'
