@@ -1,16 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from datetime import datetime
 from django.db import models
 
 from users.models import User
-
-
-class Genre(models.Model):
-    name = models.TextField(max_length=256)
-    slug = models.SlugField(unique=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Category(models.Model):
@@ -22,27 +14,32 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    name = models.TextField(max_length=16)
-    year = models.DateTimeField('year')
-    rating = models.IntegerField()
+    name = models.TextField(max_length=64)
+    year = models.IntegerField()
+    rating = models.IntegerField(
+        null=True,
+        blank=True
+    )
     description = models.TextField(
         null=True,
         blank=True
     )
     category = models.ForeignKey(
         Category,
-        null=True,
-        blank=True,
-        related_name='titles',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
+        related_name='titles'
     )
-    genre = models.ForeignKey(
-        Genre,
-        null=True,
-        blank=True,
-        related_name='titles',
-        on_delete=models.SET_NULL,
-        # many=True
+
+    def __str__(self):
+        return self.name
+
+
+class Genre(models.Model):
+    name = models.TextField(max_length=256)
+    slug = models.SlugField(unique=True)
+    title = models.ManyToManyField(
+        Title,
+        related_name='genre'
     )
 
     def __str__(self):
@@ -50,7 +47,6 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-#          pass
     title_id = models.ForeignKey(Title, on_delete=models.CASCADE,
                                  related_name='reviews')
     text = models.TextField()
@@ -71,8 +67,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-#     pass
-    review_id = models.ForeignKey(Review, on_delete=models.CASCADE,
+    review = models.ForeignKey(Review, on_delete=models.CASCADE,
                                   related_name='comments')
     text = models.TextField()
     author = models.ForeignKey(

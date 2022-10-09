@@ -128,7 +128,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     search_fields = ('category', 'genre', 'name', 'year')
 
     def get_title(self):
-        return get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return get_object_or_404(Title, pk=self.kwargs.get('id'))
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
