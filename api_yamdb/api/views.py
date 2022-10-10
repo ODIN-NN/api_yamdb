@@ -1,6 +1,7 @@
 import secrets
 
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, viewsets, filters, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
@@ -16,7 +17,7 @@ from reviews.models import (
     Title
 )
 from users.models import User
-from .permissions import IsAdmin
+from .permissions import IsAdmin, IsAdminModeratorAuthorOrReadOnly
 from .serializers import (
     CommentSerializer,
     CategorySerializer,
@@ -132,7 +133,9 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = ReviewSerializer
+    permission_classes = (IsAdminModeratorAuthorOrReadOnly, )
 
     def get_title(self):
         return get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -145,7 +148,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = CommentSerializer
+    permission_classes = (IsAdminModeratorAuthorOrReadOnly,)
 
     def get_review(self):
         return get_object_or_404(Review, pk=self.kwargs.get('review_id'))
