@@ -1,3 +1,5 @@
+from unicodedata import category
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
@@ -70,10 +72,14 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name', 'slug')
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Genre
         fields = ('name', 'slug')
@@ -82,6 +88,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     # year = serializers.DateField(format="%Y", input_formats=["%Y"])
     rating = serializers.IntegerField(required=False)
+    # genre_slug = serializers.SerializerMethodField()
     genre = serializers.SlugRelatedField(
         many=True,
         slug_field='slug',
@@ -91,18 +98,24 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
-    # genre = GenreSerializer(many=True)
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
 
-    # def create(self, validated_data):
-    #     # genres = validated_data.pop('genre')
-    #     # title = Title.objects.create(genre=genres)
-    #     title = Title.objects.create(**validated_data)
-    #     return title
+    # def get_genre_slug(self, obj):
+    #     print(f'ПЕЧАТАЕМ obj {obj}')
+    #     return f'!!!!!{obj}'
 
+class TitleListSerializer(serializers.ModelSerializer):
+    # year = serializers.DateField(format="%Y", input_formats=["%Y"])
+    rating = serializers.IntegerField(required=False)
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(

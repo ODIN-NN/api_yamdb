@@ -10,7 +10,7 @@ class Category(models.Model):
     slug = models.SlugField(unique=True)
 
     def __str__(self):
-        return self.name
+        return f"{{'name': {self.name}, 'slug': {self.slug}}}"
 
 
 class Title(models.Model):
@@ -43,7 +43,7 @@ class Genre(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f"{{'name': {self.name}, 'slug': {self.slug}}}"
 
 
 class Review(models.Model):
