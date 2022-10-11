@@ -160,9 +160,10 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     # genre_slug = TitleSerializer(queryset)
-    genre_slug = Genre.objects.all().values('slug')
-    print(f'ПЕЧАТАЕМ genre_slug {genre_slug}')
-    print(f'ПЕЧАТАЕМ genre_slug {dir(genre_slug)}')
+    # data = list(Genre.objects.all().values('slug'))
+    # genre_slug = list((obj['slug'] for obj in data))
+    # print(f'ПЕЧАТАЕМ genre_slug {genre_slug}')
+    # print(f'ПЕЧАТАЕМ genre_slug {dir(genre_slug)}')
     search_fields = ('category', 'genre', 'name', 'year', 'genre_slug')
     lookup_field = 'id'
 
@@ -172,14 +173,17 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleSerializer
 
     def get_permissions(self):
-        if self.action == 'list':
+        if self.action == 'list' or self.request.auth == None:
             permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
         else:
             permission_classes = [IsAdmin]
         return [permission() for permission in permission_classes]
 
     def retrieve(self, request, id=lookup_field):
-        permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+        # print(f'ПЕЧАТАЕМ RequestAuth {request.auth}')
+        # request_dict = request.__dict__
+        # print(f'ПЕЧАТАЕМ Request {request_dict}')
+        # print(f'ПЕЧАТАЕМ DIR Request {dir(request.auth)}')
         queryset = Title.objects.all()
         title = get_object_or_404(queryset, pk=id)
         serializer_class = TitleListSerializer(title)
