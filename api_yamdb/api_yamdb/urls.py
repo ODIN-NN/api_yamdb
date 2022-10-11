@@ -16,10 +16,11 @@ from api.views import (
 )
 
 router = routers.DefaultRouter()
-router.register(r'categories', CategoryViewSet)
+router.register(r'categories', CategoryViewSet, basename='categories')
+# router.register(r'categories/(?P<slug>[a-z0-9]+)', CategoryViewSet, basename='category-slug')
 router.register(r'genres', GenreViewSet)
 router.register(r'titles', TitleViewSet)
-router.register(r'^titles/(?P<id>\d+)', TitleViewSet)
+# router.register(r'^titles/(?P<id>\d+)', TitleViewSet)
 router.register('users', UserViewSet, basename='users')
 #router.register(r'reviews', ReviewViewSet, basename='rewiews')
 #router.register(r'^reviews/(?P<reviews_id>\d+)', ReviewViewSet)
