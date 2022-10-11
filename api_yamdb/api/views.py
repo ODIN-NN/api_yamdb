@@ -4,6 +4,7 @@ from rest_framework.parsers import JSONParser
 from django.forms.models import model_to_dict
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, serializers, mixins, permissions, filters, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
@@ -158,14 +159,27 @@ class TitleViewSet(viewsets.ModelViewSet):
     # serializer_class = TitleSerializer
     # permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('genre', 'category')
     # genre_slug = TitleSerializer(queryset)
     # data = list(Genre.objects.all().values('slug'))
     # genre_slug = list((obj['slug'] for obj in data))
     # print(f'ПЕЧАТАЕМ genre_slug {genre_slug}')
     # print(f'ПЕЧАТАЕМ genre_slug {dir(genre_slug)}')
-    search_fields = ('category', 'genre', 'name', 'year', 'genre_slug')
+    # search_fields = ('category', 'genre', 'name', 'year', 'genre_slug')
     lookup_field = 'id'
+
+    # def get_queryset(self):
+    #     genre_slug = self.request.query_params.get('genre')
+    #     print(f'ПЕЧАТАЕМ genre_slug {genre_slug}')
+    #     if genre_slug is not None:
+    #         genre_slug_id = Genre.objects.get(slug=genre_slug)
+    #         print(f'ПЕЧАТАЕМ genre_slug_id {genre_slug_id}')
+    #         queryset = Title.objects.filter(genre=genre_slug_id)
+    #         print(f'ПЕЧАТАЕМ genre_slug_id_queryset {queryset}')
+    #     else:
+    #         queryset = Title.objects.all()
+    #     return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -180,10 +194,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def retrieve(self, request, id=lookup_field):
-        # print(f'ПЕЧАТАЕМ RequestAuth {request.auth}')
-        # request_dict = request.__dict__
-        # print(f'ПЕЧАТАЕМ Request {request_dict}')
-        # print(f'ПЕЧАТАЕМ DIR Request {dir(request.auth)}')
         queryset = Title.objects.all()
         title = get_object_or_404(queryset, pk=id)
         serializer_class = TitleListSerializer(title)
