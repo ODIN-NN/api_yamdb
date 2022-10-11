@@ -1,7 +1,10 @@
 import secrets
-
+import io
+from rest_framework.parsers import JSONParser
+from django.forms.models import model_to_dict
 from django.core.mail import send_mail
-from rest_framework import viewsets, permissions, viewsets, filters, status
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, serializers, mixins, permissions, filters, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -23,6 +26,7 @@ from .serializers import (
     GenreSerializer,
     ReviewSerializer,
     TitleSerializer,
+    TitleListSerializer,
     UserSerializer,
     SignUpSerializer,
     ObtainTokenSerializer,
@@ -106,29 +110,80 @@ class UserViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    # permission_classes = (IsAdmin, )
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     pagination_class = LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+
+    def retrieve(self, request, slug=lookup_field):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, slug=lookup_field):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+        else:
+            permission_classes = [IsAdmin]
+        return [permission() for permission in permission_classes]
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    # permission_classes = (IsAdmin, )
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     pagination_class = LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+
+    def retrieve(self, request, slug=lookup_field):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, slug=lookup_field):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+        else:
+            permission_classes = [IsAdmin]
+        return [permission() for permission in permission_classes]
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    # serializer_class = TitleSerializer
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('category', 'genre', 'name', 'year')
+    # genre_slug = TitleSerializer(queryset)
+    genre_slug = Genre.objects.all().values('slug')
+    print(f'ПЕЧАТАЕМ genre_slug {genre_slug}')
+    print(f'ПЕЧАТАЕМ genre_slug {dir(genre_slug)}')
+    search_fields = ('category', 'genre', 'name', 'year', 'genre_slug')
+    lookup_field = 'id'
 
-    def get_title(self):
-        return get_object_or_404(Title, pk=self.kwargs.get('id'))
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return TitleListSerializer
+        return TitleSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+        else:
+            permission_classes = [IsAdmin]
+        return [permission() for permission in permission_classes]
+
+    def retrieve(self, request, id=lookup_field):
+        permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+        queryset = Title.objects.all()
+        title = get_object_or_404(queryset, pk=id)
+        serializer_class = TitleListSerializer(title)
+        return Response(serializer_class.data)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
