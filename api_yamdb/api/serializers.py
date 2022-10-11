@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
 from datetime import date, datetime
-
+from django.shortcuts import get_object_or_404
 from users.models import User
 from reviews.models import (
     Category,
@@ -13,7 +13,7 @@ from reviews.models import (
     Review,
     Title
 )
-
+from django.core.exceptions import ValidationError
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
@@ -117,8 +117,29 @@ class TitleListSerializer(serializers.ModelSerializer):
         model = Title
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
 
-
 class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='author'
+    )
+    title = SlugRelatedField(
+        slug_field='title',
+        read_only=True,
+    )
+
+    def validate(self, data):
+        request = self.context['request']
+        author = request.user
+        title_id = self.context['view'].kwargs.get('title_id')
+        title = get_object_or_404(Title, pk=title_id)
+        if request.method == 'POST':
+            if Review.objects.filter(
+                title=title, author=author
+            ).exist():
+                raise ValidationError(
+                    'На произведение возможен только один отзыв.'
+                )
+        return data
+
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
