@@ -14,7 +14,7 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    name = models.TextField(max_length=64)
+    name = models.TextField(max_length=256)
     year = models.IntegerField()
 #    rating = models.IntegerField(
 #        null=True,
@@ -29,6 +29,9 @@ class Title(models.Model):
         on_delete=models.CASCADE,
         related_name='titles'
     )
+
+    def genre(self):
+        return self.genre_set.all()
 
     def __str__(self):
         return self.name
