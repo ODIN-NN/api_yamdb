@@ -1,4 +1,3 @@
-from unicodedata import category
 from django_filters import rest_framework as filters
 from reviews.models import Title, Genre, Category
 

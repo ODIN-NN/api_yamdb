@@ -1,5 +1,4 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
-from datetime import datetime
 from django.db import models
 
 from users.models import User
@@ -16,10 +15,6 @@ class Category(models.Model):
 class Title(models.Model):
     name = models.TextField(max_length=256)
     year = models.IntegerField()
-#    rating = models.IntegerField(
-#        null=True,
-#        blank=True
-#    )
     description = models.TextField(
         null=True,
         blank=True
@@ -51,7 +46,7 @@ class Genre(models.Model):
 
 class Review(models.Model):
     title = models.ForeignKey(Title, on_delete=models.CASCADE,
-                                 related_name='reviews')
+                              related_name='reviews')
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='reviews')
@@ -66,12 +61,6 @@ class Review(models.Model):
         'Дата добавления', auto_now_add=True, db_index=True)
 
     class Meta:
-#        constraints = [
-#            models.UniqueConstraint(
-#                fields=['title', 'author'],
-#                name='unique_title_author'
-#            )
-#        ]
         unique_together = ('title', 'author')
 
     def __str__(self):

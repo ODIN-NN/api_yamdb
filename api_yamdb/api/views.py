@@ -1,25 +1,19 @@
 
 from re import T
 import secrets
-import io
-from unicodedata import category
-from rest_framework.parsers import JSONParser
-from django.forms.models import model_to_dict
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, serializers, mixins, permissions, filters, status
+from rest_framework import viewsets, permissions, filters, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Avg
-from django.http import Http404
 from api_yamdb.settings import FROM_EMAIL
 from .filters import TitleFilter
 from reviews.models import (
     Category,
-    Comment,
     Genre,
     Review,
     Title
@@ -116,7 +110,6 @@ class UserViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    # permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -139,7 +132,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    # permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -166,14 +158,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     lookup_field = 'id'
     filterset_class = TitleFilter
 
-
     def get_serializer_class(self):
         if self.action == 'list':
             return TitleListSerializer
         return TitleSerializer
 
     def get_permissions(self):
-        if self.action == 'list' or self.request.auth == None:
+        if self.action == 'list' or self.request.auth is None:
             permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
         else:
             permission_classes = [IsAdmin]
@@ -201,8 +192,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, title=self.get_title())
-
-
 
 
 class CommentViewSet(viewsets.ModelViewSet):
