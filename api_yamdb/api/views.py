@@ -10,7 +10,8 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.db.models import Avg
+from django.http import Http404
 from api_yamdb.settings import FROM_EMAIL
 from reviews.models import (
     Category,
@@ -155,7 +156,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     # serializer_class = TitleSerializer
     # permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     pagination_class = LimitOffsetPagination
@@ -194,7 +195,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def retrieve(self, request, id=lookup_field):
-        queryset = Title.objects.all()
+        queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
         title = get_object_or_404(queryset, pk=id)
         serializer_class = TitleListSerializer(title)
         return Response(serializer_class.data)
@@ -203,7 +204,9 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = ReviewSerializer
-    permission_classes = (IsAdminModeratorAuthorOrReadOnly, )
+    permission_classes = (IsAdminModeratorAuthorOrReadOnly,
+                          permissions.IsAuthenticatedOrReadOnly)
+    pagination_class = LimitOffsetPagination
 
     def get_title(self):
         return get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -215,10 +218,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, title=self.get_title())
 
 
+
+
 class CommentViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = CommentSerializer
-    permission_classes = (IsAdminModeratorAuthorOrReadOnly,)
+    permission_classes = (IsAdminModeratorAuthorOrReadOnly,
+                          permissions.IsAuthenticatedOrReadOnly)
+    pagination_class = LimitOffsetPagination
 
     def get_review(self):
         return get_object_or_404(Review, pk=self.kwargs.get('review_id'))

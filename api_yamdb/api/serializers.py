@@ -155,6 +155,16 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+        #        queryset=User.objects
+    )
+    review = SlugRelatedField(
+        slug_field='id',
+        read_only=True,
+        #       queryset=Title.objects
+    )
     class Meta:
         model = Comment
-        fields = ('id', 'text', 'author', 'pub_date')
+        fields = ('id', 'text', 'author', 'pub_date', 'review')
