@@ -23,26 +23,26 @@ router.register(r'titles', TitleViewSet)
 # router.register(r'^titles/(?P<id>\d+)', TitleViewSet)
 router.register('users', UserViewSet, basename='users')
 router.register(
-    r'titles/(?P<title_id>\d+)/reviews/',
+    r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,
     basename='reviews'
 )
-router.register(
-    r'titles/(?P<title_id>\d+)/reviews/(?P<id>\d+)/',
-    ReviewViewSet,
-    basename='review'
-)
+#router.register(
+#    r'titles/(?P<title_id>\d+)/reviews/(?P<id>\d+)/',
+#    ReviewViewSet,
+#    basename='review'
+#)
 router.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet,
     basename='comments'
 )
-router.register(
-    r'titles/(?P<title_id>\d+)/reviews'
-    r'/(?P<review_id>\d+)/comments/(?P<id>\d+)/',
-    CommentViewSet,
-    basename='comment'
-)
+#router.register(
+#    r'titles/(?P<title_id>\d+)/reviews'
+#    r'/(?P<review_id>\d+)/comments/(?P<id>\d+)/',
+#    CommentViewSet,
+#    basename='comment'
+#)
 
 
 urlpatterns = [
