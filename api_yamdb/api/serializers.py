@@ -1,9 +1,7 @@
-from unicodedata import category
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
-from datetime import date, datetime
 from django.shortcuts import get_object_or_404
 from users.models import User
 from reviews.models import (
@@ -14,6 +12,7 @@ from reviews.models import (
     Title
 )
 from django.core.exceptions import ValidationError
+
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
@@ -86,9 +85,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    # year = serializers.DateField(format="%Y", input_formats=["%Y"])
     rating = serializers.IntegerField(required=False)
-    # genre_slug = serializers.SerializerMethodField()
     genre = serializers.SlugRelatedField(
         many=True,
         slug_field='slug',
@@ -101,32 +98,29 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
 
-    # def get_genre_slug(self, obj):
-    #     print(f'ПЕЧАТАЕМ obj {obj}')
-    #     return f'!!!!!{obj}'
 
 class TitleListSerializer(serializers.ModelSerializer):
-    # year = serializers.DateField(format="%Y", input_formats=["%Y"])
     rating = serializers.IntegerField(required=False)
     genre = GenreSerializer(many=True)
     category = CategorySerializer(read_only=True)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
-#        queryset=User.objects
     )
     title = SlugRelatedField(
         slug_field='name',
         read_only=True,
-#       queryset=Title.objects
     )
 
     def validate(self, data):
@@ -146,25 +140,18 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date', 'title')
-#        validators = [
-#            UniqueValidator(
-#                queryset=Review.objects.all(),
-#                fields=('title', 'author')
-#            )
-#        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
-        #        queryset=User.objects
     )
     review = SlugRelatedField(
         slug_field='id',
         read_only=True,
-        #       queryset=Title.objects
     )
+
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date', 'review')
