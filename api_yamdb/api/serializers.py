@@ -119,11 +119,14 @@ class TitleListSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='author'
+        read_only=True,
+        slug_field='username'
+#        queryset=User.objects
     )
     title = SlugRelatedField(
-        slug_field='title',
+        slug_field='name',
         read_only=True,
+#       queryset=Title.objects
     )
 
     def validate(self, data):
@@ -134,7 +137,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         if request.method == 'POST':
             if Review.objects.filter(
                 title=title, author=author
-            ).exist():
+            ).exists():
                 raise ValidationError(
                     'На произведение возможен только один отзыв.'
                 )
@@ -142,7 +145,13 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date', 'title')
+#        validators = [
+#            UniqueValidator(
+#                queryset=Review.objects.all(),
+#                fields=('title', 'author')
+#            )
+#        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):

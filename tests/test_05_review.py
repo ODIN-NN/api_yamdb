@@ -10,6 +10,7 @@ class Test05ReviewAPI:
     def test_01_review_not_auth(self, client, admin_client):
         titles, _, _ = create_titles(admin_client)
         response = client.get(f'/api/v1/titles/{titles[0]["id"]}/reviews/')
+        print(response.content)
         assert response.status_code != 404, (
             'Страница `/api/v1/titles/{title_id}/reviews/` не найдена, проверьте этот адрес в *urls.py*'
         )
