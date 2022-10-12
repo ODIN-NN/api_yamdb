@@ -1,5 +1,8 @@
+
+from re import T
 import secrets
 import io
+from unicodedata import category
 from rest_framework.parsers import JSONParser
 from django.forms.models import model_to_dict
 from django.core.mail import send_mail
@@ -12,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api_yamdb.settings import FROM_EMAIL
+from .filters import TitleFilter
 from reviews.models import (
     Category,
     Comment,
@@ -156,30 +160,12 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    # serializer_class = TitleSerializer
     # permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('genre', 'category')
-    # genre_slug = TitleSerializer(queryset)
-    # data = list(Genre.objects.all().values('slug'))
-    # genre_slug = list((obj['slug'] for obj in data))
-    # print(f'ПЕЧАТАЕМ genre_slug {genre_slug}')
-    # print(f'ПЕЧАТАЕМ genre_slug {dir(genre_slug)}')
-    # search_fields = ('category', 'genre', 'name', 'year', 'genre_slug')
     lookup_field = 'id'
+    filterset_class = TitleFilter
 
-    # def get_queryset(self):
-    #     genre_slug = self.request.query_params.get('genre')
-    #     print(f'ПЕЧАТАЕМ genre_slug {genre_slug}')
-    #     if genre_slug is not None:
-    #         genre_slug_id = Genre.objects.get(slug=genre_slug)
-    #         print(f'ПЕЧАТАЕМ genre_slug_id {genre_slug_id}')
-    #         queryset = Title.objects.filter(genre=genre_slug_id)
-    #         print(f'ПЕЧАТАЕМ genre_slug_id_queryset {queryset}')
-    #     else:
-    #         queryset = Title.objects.all()
-    #     return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':
