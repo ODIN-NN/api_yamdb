@@ -16,10 +16,10 @@ class Category(models.Model):
 class Title(models.Model):
     name = models.TextField(max_length=256)
     year = models.IntegerField()
-    rating = models.IntegerField(
-        null=True,
-        blank=True
-    )
+#    rating = models.IntegerField(
+#        null=True,
+#        blank=True
+#    )
     description = models.TextField(
         null=True,
         blank=True
@@ -66,12 +66,13 @@ class Review(models.Model):
         'Дата добавления', auto_now_add=True, db_index=True)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['title', 'author'],
-                name='unique_title_author'
-            )
-        ]
+#        constraints = [
+#            models.UniqueConstraint(
+#                fields=['title', 'author'],
+#                name='unique_title_author'
+#            )
+#        ]
+        unique_together = ('title', 'author')
 
     def __str__(self):
         return f'Отзыв о произведении {self.title_id.name}'
