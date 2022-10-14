@@ -17,8 +17,8 @@ class Category(models.Model):
     )
 
     class Meta:
-        verbose_name='Категория',
-        verbose_name_plural='Категории'
+        verbose_name = 'Категория',
+        verbose_name_plural = 'Категории'
 
 
 class Title(models.Model):
@@ -51,8 +51,8 @@ class Title(models.Model):
         return self.name
 
     class Meta:
-        verbose_name='Произведение',
-        verbose_name_plural='Произведения'
+        verbose_name = 'Произведение',
+        verbose_name_plural = 'Произведения'
 
 
 class Genre(models.Model):
@@ -72,8 +72,8 @@ class Genre(models.Model):
         return f"{{'name': {self.name}, 'slug': {self.slug}}}"
 
     class Meta:
-        verbose_name='Жанр',
-        verbose_name_plural='Жанры'
+        verbose_name = 'Жанр',
+        verbose_name_plural = 'Жанры'
 
 
 class Review(models.Model):
