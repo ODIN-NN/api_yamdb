@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
+import datetime as dt
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
@@ -75,11 +76,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('name', 'slug')
-        lookup_field = 'slug'
-        extra_kwargs = {
-            'url': {'lookup_field': 'slug'}
-        }
+        exclude = ('id',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -101,6 +98,20 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all()
     )
 
+    def validate_year(self, year):
+        if year > dt.date.today().year:
+            raise serializers.ValidationError([
+                'Дождитесь создания произведения'
+            ]
+            )
+        if year < -4000:
+            raise serializers.ValidationError([
+                'Наличие письменности ранее Шумерской циилизации'
+                'не подтверждено'
+            ]
+            )
+        return year
+
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'rating',
@@ -110,7 +121,7 @@ class TitleSerializer(serializers.ModelSerializer):
 class TitleListSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(required=False)
     genre = GenreSerializer(many=True)
-    category = CategorySerializer(read_only=True)
+    category = CategorySerializer()
 
     class Meta:
         model = Title

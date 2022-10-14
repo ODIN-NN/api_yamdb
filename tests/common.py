@@ -42,6 +42,7 @@ def create_categories(admin_client):
         'slug': 'books'
     }
     admin_client.post('/api/v1/categories/', data=data2)
+    # print(f'ПЕЧАТАЕМ category data1 {data1} и {data2}')
     return [data1, data2]
 
 
@@ -61,20 +62,21 @@ def create_genre(admin_client):
 
 def create_titles(admin_client):
     genres = create_genre(admin_client)
-    print(f' печатаем GENRES {genres}')
+    # print(f' печатаем GENRES {genres}')
     categories = create_categories(admin_client)
-    print(f' печатаем CATEGORIES {categories}')
+    # print(f' печатаем CATEGORIES {categories}')
     result = []
     data = {'name': 'Поворот туда', 'year': 2000, 'genre': [genres[0]['slug'], genres[1]['slug']],
             'category': categories[0]['slug'], 'description': 'Крутое пике'}
     response = admin_client.post('/api/v1/titles/', data=data)
-    print(f' печатаем DATA {data}')
-    print(f' печатаем RESPONSE: {response.json()}')
+    # print(f' печатаем DATA {data}')
+    # print(f' печатаем RESPONSE1: {response.json()}')
     data['id'] = response.json()['id']
     result.append(data)
     data = {'name': 'Проект', 'year': 2020, 'genre': [genres[2]['slug']], 'category': categories[1]['slug'],
             'description': 'Главная драма года'}
     response = admin_client.post('/api/v1/titles/', data=data)
+    # print(f' печатаем RESPONSE2: {response.json()}')
     data['id'] = response.json()['id']
     result.append(data)
     return result, categories, genres
