@@ -112,7 +112,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = LimitOffsetPagination
-    # permission_classes = (IsAdminModeratorAuthorOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -122,19 +122,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, slug=lookup_field):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def get_permissions(self):
-        if self.action == 'list':
-            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-        else:
-            permission_classes = [IsAdmin]
-        return [permission() for permission in permission_classes]
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -145,20 +139,10 @@ class GenreViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, slug=lookup_field):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def get_permissions(self):
-        if self.action == 'list':
-            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-        else:
-            permission_classes = [IsAdmin]
-        return [permission() for permission in permission_classes]
-
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     pagination_class = LimitOffsetPagination
-    # permission_classes = (permissions.AllowAny, )
-    # permission_classes = (IsAdminModeratorAuthorOrReadOnly, )
-    # permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsAdminModeratorAuthorOrReadOnly, )
     permission_classes = (IsAdmin, )
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (IsAdminOrReadOnly,)
@@ -169,16 +153,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve'):
             return TitleListSerializer
         return TitleSerializer
-
-    # def get_permissions(self):
-    #     if self.action == 'list' or self.request.auth is None:
-    #         permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
-    #     else:
-    #         permission_classes = [IsAdmin]
-    #     p = [permission() for permission in permission_classes]
-    #     print(f' ПЕЧАТАЕМ permissions {str(p)}')
-    #     return p
-    #     return [permission() for permission in permission_classes]
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
