@@ -1,6 +1,7 @@
-
 import secrets
+
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, filters, status
@@ -8,9 +9,8 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.db.models import Avg
+
 from api_yamdb.settings import FROM_EMAIL
-from .filters import TitleFilter
 from reviews.models import (
     Category,
     Genre,
@@ -18,7 +18,9 @@ from reviews.models import (
     Title
 )
 from users.models import User
-from .permissions import IsAdmin, IsAdminModeratorAuthorOrReadOnly
+from .filters import TitleFilter
+from .permissions import (
+    IsAdmin, IsAdminModeratorAuthorOrReadOnly, IsAdminOrReadOnly)
 from .serializers import (
     CommentSerializer,
     CategorySerializer,
@@ -39,7 +41,7 @@ def create(request):
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     secret_code = secrets.token_urlsafe()
-    user, _ = User.objects.get_or_create(
+    user, email = User.objects.get_or_create(
         username=serializer.data['username'],
         email=serializer.data['email'],
         confirmation_code=secret_code
@@ -47,7 +49,7 @@ def create(request):
     message = ('Для завершения регистрации на сайте введите '
                f'confirmation_code: {secret_code}')
     send_mail(
-        subject='Registration',
+        subject='Registration API_yambd',
         message=message,
         from_email=FROM_EMAIL,
         recipient_list=[user.email]
@@ -159,6 +161,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     # permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsAdminModeratorAuthorOrReadOnly, )
     permission_classes = (IsAdmin, )
     filter_backends = (DjangoFilterBackend,)
+    permission_classes = (IsAdminOrReadOnly,)
     lookup_field = 'id'
     filterset_class = TitleFilter
 
@@ -175,6 +178,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     #     p = [permission() for permission in permission_classes]
     #     print(f' ПЕЧАТАЕМ permissions {str(p)}')
     #     return p
+    #     return [permission() for permission in permission_classes]
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

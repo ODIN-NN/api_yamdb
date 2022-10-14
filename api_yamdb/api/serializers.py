@@ -1,9 +1,10 @@
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 import datetime as dt
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
-from django.shortcuts import get_object_or_404
+
 from users.models import User
 from reviews.models import (
     Category,
@@ -12,17 +13,18 @@ from reviews.models import (
     Review,
     Title
 )
-from django.core.exceptions import ValidationError
 
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
-        validators=[UniqueValidator(queryset=User.objects.all())],
-        required=True,
+        validators=[UniqueValidator(
+            queryset=User.objects.all(),
+            message='Поле "username" должно быть уникальным')],
     )
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())],
-        required=True,
+        validators=[UniqueValidator(
+            queryset=User.objects.all(),
+            message='Поле "email" должно быть уникальным')],
     )
 
     class Meta:
@@ -37,21 +39,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SignUpSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
-        validators=[UniqueValidator(queryset=User.objects.all())],
-        required=True,
+        validators=[UniqueValidator(
+            queryset=User.objects.all(),
+            message='Поле "username" должно быть уникальным'
+        )],
     )
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())],
-        required=True,
+        validators=[UniqueValidator(
+            queryset=User.objects.all(),
+            message='Поле "email" должно быть уникальным'
+        )],
     )
 
     class Meta:
         model = User
         fields = ('email', 'username')
 
-    def validate(self, value):
-        username = value['username']
-        if username == 'me':
+    def validate_username(self, value):
+        if value == 'me':
             raise serializers.ValidationError(
                 'Использовать имя "me" в качестве username запрещено'
             )
