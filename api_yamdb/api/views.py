@@ -110,6 +110,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = LimitOffsetPagination
+    # permission_classes = (IsAdminModeratorAuthorOrReadOnly, )
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -153,27 +154,27 @@ class GenreViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     pagination_class = LimitOffsetPagination
+    # permission_classes = (permissions.AllowAny, )
+    # permission_classes = (IsAdminModeratorAuthorOrReadOnly, )
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsAdminModeratorAuthorOrReadOnly, )
+    permission_classes = (IsAdmin, )
     filter_backends = (DjangoFilterBackend,)
     lookup_field = 'id'
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action in ('list', 'retrieve'):
             return TitleListSerializer
         return TitleSerializer
 
-    def get_permissions(self):
-        if self.action == 'list' or self.request.auth is None:
-            permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
-        else:
-            permission_classes = [IsAdmin]
-        return [permission() for permission in permission_classes]
-
-    def retrieve(self, request, id=lookup_field):
-        queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
-        title = get_object_or_404(queryset, pk=id)
-        serializer_class = TitleListSerializer(title)
-        return Response(serializer_class.data)
+    # def get_permissions(self):
+    #     if self.action == 'list' or self.request.auth is None:
+    #         permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+    #     else:
+    #         permission_classes = [IsAdmin]
+    #     p = [permission() for permission in permission_classes]
+    #     print(f' ПЕЧАТАЕМ permissions {str(p)}')
+    #     return p
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

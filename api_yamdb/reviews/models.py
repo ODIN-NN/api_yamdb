@@ -1,26 +1,45 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+import datetime as dt
 
 from users.models import User
 
 
 class Category(models.Model):
-    name = models.TextField(max_length=256)
-    slug = models.SlugField(unique=True)
+    name = models.TextField(
+        db_index=True,
+        max_length=256,
+        verbose_name='Название категории',
+    )
+    slug = models.SlugField(
+        unique=True,
+        max_length=50,
+    )
 
-    def __str__(self):
-        return f"{{'name': {self.name}, 'slug': {self.slug}}}"
+    class Meta:
+        verbose_name='Категория',
+        verbose_name_plural='Категории'
 
 
 class Title(models.Model):
-    name = models.TextField(max_length=256)
-    year = models.IntegerField()
+    name = models.TextField(
+        db_index=True,
+        max_length=256,
+        verbose_name='Название произедения',
+    )
+    year = models.IntegerField(
+        validators=[
+            MaxValueValidator(dt.date.today().year),
+            MinValueValidator(-4000),
+        ]
+    )
     description = models.TextField(
         null=True,
         blank=True
     )
     category = models.ForeignKey(
         Category,
+        db_index=True,
         on_delete=models.CASCADE,
         related_name='titles'
     )
@@ -31,17 +50,30 @@ class Title(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name='Произведение',
+        verbose_name_plural='Произведения'
+
 
 class Genre(models.Model):
-    name = models.TextField(max_length=256)
+    name = models.TextField(
+        db_index=True,
+        max_length=256,
+        verbose_name='Название жанра'
+    )
     slug = models.SlugField(unique=True)
     title = models.ManyToManyField(
         Title,
+        db_index=True,
         related_name='genre'
     )
 
     def __str__(self):
         return f"{{'name': {self.name}, 'slug': {self.slug}}}"
+
+    class Meta:
+        verbose_name='Жанр',
+        verbose_name_plural='Жанры'
 
 
 class Review(models.Model):
